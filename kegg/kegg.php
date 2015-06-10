@@ -737,15 +737,55 @@ class KEGGParser extends Bio2RDFizer
 	}
 	
 	// php runparser.php parser=kegg files=pathway
-	function parseKGML($lfile)
-	{
+	function parseKGML($lfile) {
+	
+		// echo $lfile.PHP_EOL;
+
+		// Using built-in SimpleXML parser
+
 		// read XML
 		
+		$xml = simplexml_load_file($lfile) or die("Error: Cannot create object");
+		$pathName = $xml['name'];
+		$pathOrg = $xml['org'];
+		$pathNumb = $xml['number'];
+		$pathTitle = $xml['title'];
+		$pathImg = $xml['image'];
+		$pathLink = $xml['link'];
+
 		// iterate over relations
+
+		foreach($xml->children() as $entries) {
+			
+			/*
+			if(isset($entries->graphics)) {}
+			else if(isset($entries['entry1'])) {}
+			else {}
+			*/
+
+			if(isset($entries['entry1'])) {
+				$relE1 = $entries['entry1'];
+				$relE2 = $entries['entry2'];
+				$relType = $entries['type'];
+				$relSubName = $entries->subtype['name'];
+				$relSubVal = $entries->subtype['value'];
+			}
+		}
+		
+		// write rdf 
 		
 		
-			// write rdf 
+		// All of the above Using XMLDOM parser (if need be)
+		/*
+			
+		*/
+
+		// All of the above Using XMLExpat parser (if need be)
+		/*
+			
+		*/
 		
+		exit;
 	}
 }
 
