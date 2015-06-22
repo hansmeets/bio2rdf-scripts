@@ -737,54 +737,59 @@ class KEGGParser extends Bio2RDFizer
 	}
 	
 	// php runparser.php parser=kegg files=pathway
-	function parseKGML($lfile) {
-	
-		// echo $lfile.PHP_EOL;
+	function parseKGML($lfile) 
 
-		// Using built-in SimpleXML parser
-
-		// read XML
+	{
+		parent::deleteRDF();
 		
-		$xml = simplexml_load_file($lfile) or die("Error: Cannot create object");
-		$pathName = $xml['name'];
-		$pathOrg = $xml['org'];
-		$pathNumb = $xml['number'];
-		$pathTitle = $xml['title'];
-		$pathImg = $xml['image'];
-		$pathLink = $xml['link'];
-
+		$pathway = simplexml_load_file($lfile) or die("Error: Cannot create object");
+		$pathway_id = str_replace("path","kegg",$pathway['name']);
+		parent::addRDF(
+			parent::describeIndividual($pathway_id, $pathway['title'], parent::getVoc()."Pathway").
+			parent::triplify($pathway_id, "foaf:depiction", $pathway['image'])
+		);
+		
+		// echo parent::getRDF();exit;
 		// iterate over relations
+		foreach($pathway->children() as $type => $item) {
+			if($type == "entry") {
+				$entries[ ''.$item['id'] ] = ''.$item['name']; 
+				continue;
+			} else if ($type == "relation") {
+				
+				$relation_id = str_replace("kegg","kegg_resource",$pathway_id).$item['entry1'].$item['entry2'].$item['type'];
+				$ids1 = explode(" ",$entries[ ''.$item['entry1'] ]);
+				$ids2 = explode(" ",$entries[ ''.$item['entry2'] ]);
+				foreach($ids1 AS $id1) {
+					foreach($ids2 AS $id2) {
+						$label = "$id1 $id2";
+						//echo $label;exit;
+						//foreach($item->children() as $subtype) {
+							parent::addRDF(
+								parent::describeIndividual($relation_id, $label, parent::getVoc()."Pathway-Relation").
+								parent::triplify($relation_id, parent::getVoc()."source", $id1).
+								parent::triplify($relation_id, parent::getVoc()."target", $id2).
+								parent::triplifyString($relation_id, parent::getVoc()."type", ''.$item['type']).
+								parent::triplifyString($relation_id, parent::getVoc()."name", ''.$item->subtype['name']).
+								parent::triplifyString($relation_id, parent::getVoc()."value", ''.$item->subtype['value'])
 
-		foreach($xml->children() as $entries) {
+							);
+						//}
+						
+
+						//exit;
+					
+					}	
+				} 		
+				/*exit;*/
+				//echo parent::getRDF();exit;
+				//exit;	
 			
-			/*
-			if(isset($entries->graphics)) {}
-			else if(isset($entries['entry1'])) {}
-			else {}
-			*/
-
-			if(isset($entries['entry1'])) {
-				$relE1 = $entries['entry1'];
-				$relE2 = $entries['entry2'];
-				$relType = $entries['type'];
-				$relSubName = $entries->subtype['name'];
-				$relSubVal = $entries->subtype['value'];
+			} else {
+				trigger_error("I don't know what this is!",E_USER_WARNING);
 			}
-		}
-		
-		// write rdf 
-		
-		
-		// All of the above Using XMLDOM parser (if need be)
-		/*
-			
-		*/
+		}				
 
-		// All of the above Using XMLExpat parser (if need be)
-		/*
-			
-		*/
-		
 		exit;
 	}
 }
