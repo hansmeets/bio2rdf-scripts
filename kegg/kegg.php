@@ -765,14 +765,22 @@ class KEGGParser extends Bio2RDFizer
 						$label = "$id1 $id2";
 						//echo $label;exit;
 						//foreach($item->children() as $subtype) {
+							$type = ''.$item['type'];
+							$name = ''.$item->subtype['name'];
+							$value = ''.$item->subtype['value'];
 							parent::addRDF(
 								parent::describeIndividual($relation_id, $label, parent::getVoc()."Pathway-Relation").
 								parent::triplify($relation_id, parent::getVoc()."source", $id1).
 								parent::triplify($relation_id, parent::getVoc()."target", $id2).
+								parent::triplifyString($relation_id, parent::getVoc()."type", $type).
+								parent::triplifyString($relation_id, parent::getVoc()."name", $name).
+								parent::triplifyString($relation_id, parent::getVoc()."value", $value)
+								
+								/*
 								parent::triplifyString($relation_id, parent::getVoc()."type", ''.$item['type']).
 								parent::triplifyString($relation_id, parent::getVoc()."name", ''.$item->subtype['name']).
 								parent::triplifyString($relation_id, parent::getVoc()."value", ''.$item->subtype['value'])
-
+								*/
 							);
 						//}
 						
@@ -788,9 +796,11 @@ class KEGGParser extends Bio2RDFizer
 			} else {
 				trigger_error("I don't know what this is!",E_USER_WARNING);
 			}
+			return;
 		}				
-
-		exit;
+		//echo parent::getRDF();exit;
+				
+		//exit;
 	}
 }
 
