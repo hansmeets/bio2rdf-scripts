@@ -764,25 +764,20 @@ class KEGGParser extends Bio2RDFizer
 					foreach($ids2 AS $id2) {
 						$label = "$id1 $id2";
 						//echo $label;exit;
-						//foreach($item->children() as $subtype) {
 							$type = ''.$item['type'];
-							$name = ''.$item->subtype['name'];
-							$value = ''.$item->subtype['value'];
 							parent::addRDF(
 								parent::describeIndividual($relation_id, $label, parent::getVoc()."Pathway-Relation").
 								parent::triplify($relation_id, parent::getVoc()."source", $id1).
 								parent::triplify($relation_id, parent::getVoc()."target", $id2).
-								parent::triplifyString($relation_id, parent::getVoc()."type", $type).
-								parent::triplifyString($relation_id, parent::getVoc()."name", $name).
-								parent::triplifyString($relation_id, parent::getVoc()."value", $value)
-								
-								/*
-								parent::triplifyString($relation_id, parent::getVoc()."type", ''.$item['type']).
-								parent::triplifyString($relation_id, parent::getVoc()."name", ''.$item->subtype['name']).
-								parent::triplifyString($relation_id, parent::getVoc()."value", ''.$item->subtype['value'])
-								*/
+								parent::triplifyString($relation_id, parent::getVoc()."type", $type)
 							);
-						//}
+
+							foreach($item->children() as $subtype) {
+								parent::addRDF(
+									parent::triplifyString($relation_id, parent::getVoc()."subtype", ''.$subtype['name'])								
+								);
+							}
+						
 						
 
 						//exit;
